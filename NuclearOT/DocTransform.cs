@@ -47,7 +47,7 @@ namespace NuclearOT
                 switch( op.Type )
                 {
                     case DocOpType.Insert:
-                        _writer.Write( op.Char.ToString() );
+                        _writer.Write( (UInt16)op.Char );
                         break;
                     case DocOpType.Delete:
                         break;
@@ -69,7 +69,7 @@ namespace NuclearOT
                 switch( opType )
                 {
                     case DocOpType.Insert:
-                        lOps.Add( DocOp.Insert( _reader.ReadUInt16(), _reader.ReadInt32(), _reader.ReadString()[0] ) );
+                        lOps.Add( DocOp.Insert( _reader.ReadUInt16(), _reader.ReadInt32(), (char)_reader.ReadUInt16() ) );
                         break;
                     case DocOpType.Delete:
                         lOps.Add( DocOp.Delete( _reader.ReadUInt16(), _reader.ReadInt32() ) );
