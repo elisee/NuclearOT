@@ -17,7 +17,7 @@ namespace NuclearOTTests
             string strInitial           = "This is a test.";
             string strExpectedResult    = "This is a successful test.";
 
-            DocTransform docTransform = new DocTransform();
+            DocTransform docTransform = new DocTransform( 0 );
             docTransform.Append( DocTransform.Insert( 0, 10, "successful " ) );
 
             string strResult = docTransform.Apply( strInitial );
@@ -31,7 +31,7 @@ namespace NuclearOTTests
             string strInitial           = "This is a failed test.";
             string strExpectedResult    = "This is a test.";
 
-            DocTransform docTransform = new DocTransform();
+            DocTransform docTransform = new DocTransform( 0 );
             docTransform.Append( DocTransform.Delete( 0, 10, 7 ) );
 
             string strResult = docTransform.Apply( strInitial );
@@ -45,7 +45,7 @@ namespace NuclearOTTests
             string strInitial           = "This is a failed test.";
             string strExpectedResult    = "This is a successful test.";
 
-            DocTransform docTransform = new DocTransform();
+            DocTransform docTransform = new DocTransform( 0 );
             docTransform.Append( DocTransform.Delete( 0, 10, 4 ) );
             docTransform.Append( DocTransform.Insert( 0, 10, "success") );
             docTransform.Append( DocTransform.Insert( 0, 17, "ful " ) );
@@ -62,15 +62,16 @@ namespace NuclearOTTests
             string strInitial           = "String";
             string strExpectedResult    = "PrefixString";
 
-            DocTransform remoteTransform = new DocTransform();
+            DocTransform remoteTransform = new DocTransform( 0 );
             remoteTransform.Append( DocTransform.Insert( 0, 0, "Prefix" ) );
 
-            DocTransform localTransform = new DocTransform();
+            DocTransform localTransform = new DocTransform( 0 );
             localTransform.Include( remoteTransform );
 
             string strResult = localTransform.Apply( strInitial );
 
             Assert.AreEqual( strExpectedResult, strResult );
+            Assert.AreEqual( localTransform.ParentStateIndex, 1 );
         }
 
         [Test]
@@ -79,16 +80,17 @@ namespace NuclearOTTests
             string strInitial           = "InitialString";
             string strExpectedResult    = "PrefixChangedInitialString";
             
-            DocTransform remoteTransform = new DocTransform();
+            DocTransform remoteTransform = new DocTransform( 0 );
             remoteTransform.Append( DocTransform.Insert( 0, 0, "Prefix" ) );
 
-            DocTransform localTransform = new DocTransform();
+            DocTransform localTransform = new DocTransform( 0 );
             localTransform.Append( DocTransform.Insert( 0, 0, "Changed" ) );
             localTransform.Include( remoteTransform );
 
             string strResult = localTransform.Apply( strInitial );
 
             Assert.AreEqual( strExpectedResult, strResult );
+            Assert.AreEqual( localTransform.ParentStateIndex, 1 );
         }
     }
 }

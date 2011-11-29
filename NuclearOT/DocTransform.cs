@@ -9,11 +9,82 @@ namespace NuclearOT
     {
         //----------------------------------------------------------------------
         List<DocOp>         mlOps;
+        public int          ParentStateIndex;
 
         //----------------------------------------------------------------------
-        public DocTransform()
+        public DocTransform( int _iParentStateIndex )
         {
-            mlOps = new List<DocOp>();
+            mlOps               = new List<DocOp>();
+            ParentStateIndex    = _iParentStateIndex;
+        }
+
+        public DocTransform Clone()
+        {
+            DocTransform clone = new DocTransform( ParentStateIndex );
+            clone.mlOps = new List<DocOp>( mlOps );
+            return clone;
+        }
+
+        public void Serialize( dynamic _writer )
+        {
+            _writer.Write( ParentStateIndex );
+            _writer.Write( mlOps.Count );
+
+            foreach( DocOp op in mlOps )
+            {
+                _writer.Write( (byte)op.Type );
+                _writer.Write( op.Site );
+                _writer.Write( op.Position );
+
+                switch( op.Type )
+                {
+                    case DocOpType.Insert:
+                        _writer.Write( op.Char.ToString() );
+                        break;
+                    case DocOpType.Delete:
+                        break;
+                }
+            }
+        }
+
+        public static DocTransform Deserialize( dynamic _reader )
+        {
+            DocTransform transform = new DocTransform( _reader.ReadInt32() );
+
+            int iOpCount = _reader.ReadInt32();
+
+            List<DocOp> lOps = new List<DocOp>();
+            for( int iOp = 0; iOp < iOpCount; iOp++ )
+            {
+                DocOpType opType = (DocOpType)_reader.ReadByte();
+
+                switch( opType )
+                {
+                    case DocOpType.Insert:
+                        lOps.Add( DocOp.Insert( _reader.ReadUInt16(), _reader.ReadInt32(), _reader.ReadString()[0] ) );
+                        break;
+                    case DocOpType.Delete:
+                        lOps.Add( DocOp.Delete( _reader.ReadUInt16(), _reader.ReadInt32() ) );
+                        break;
+                }
+            }
+
+            transform.Append( lOps );
+
+            return transform;
+        }
+
+        public bool CheckSite( UInt16 _uiMemberId )
+        {
+            foreach( DocOp op in mlOps)
+            {
+                if( op.Site != _uiMemberId )
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         //----------------------------------------------------------------------
@@ -71,12 +142,23 @@ namespace NuclearOT
         //----------------------------------------------------------------------
         public void Include( DocTransform _transform )
         {
+            Transform( _transform );
+            mlOps.InsertRange( 0, _transform.mlOps );
+        }
+
+        public void Transform( DocTransform _transform )
+        {
+            if( ParentStateIndex == _transform.ParentStateIndex - 1 )
+            {
+                throw new InvalidOperationException();
+            }
+
             foreach( DocOp refOp in _transform.mlOps )
             {
                 TransformOp( refOp );
             }
 
-            mlOps.InsertRange( 0, _transform.mlOps );
+            ParentStateIndex++;
         }
 
         //----------------------------------------------------------------------
