@@ -9,6 +9,7 @@ namespace NuclearOT
     {
         //----------------------------------------------------------------------
         List<DocOp>         mlOps;
+        public int          OpCount             { get { return mlOps.Count; } }
         public int          ParentStateIndex;
 
         //----------------------------------------------------------------------
