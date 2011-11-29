@@ -9,7 +9,14 @@ namespace NuclearOT
     {
         //----------------------------------------------------------------------
         List<DocOp>         mlOps;
+
+        public DocOp GetOp( int _iOpIndex )
+        {
+            return mlOps[ _iOpIndex ];
+        }
+
         public int          OpCount             { get { return mlOps.Count; } }
+
         public int          ParentStateIndex;
 
         //----------------------------------------------------------------------
@@ -149,7 +156,7 @@ namespace NuclearOT
 
         public void Transform( DocTransform _transform )
         {
-            if( ParentStateIndex == _transform.ParentStateIndex - 1 )
+            if( ParentStateIndex != _transform.ParentStateIndex )
             {
                 throw new InvalidOperationException();
             }
