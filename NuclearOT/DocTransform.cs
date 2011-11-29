@@ -17,26 +17,7 @@ namespace NuclearOT
         }
 
         //----------------------------------------------------------------------
-        public void Insert( UInt16 _uiSite, int _iPosition, string _strValue )
-        {
-            for( int i = 0; i < _strValue.Length; i++ )
-            {
-                DocOp insertOp = DocOp.Insert( _uiSite, _iPosition + i, _strValue[i] );
-                mlOps.Add( insertOp );
-            }
-        }
-
-        public void Delete( UInt16 _uiSite, int _iPosition, int _iCount )
-        {
-            for( int i = 0; i < _iCount; i++ )
-            {
-                DocOp deleteOp = DocOp.Delete( _uiSite, _iPosition );
-                mlOps.Add( deleteOp );
-            }
-        }
-
-        //----------------------------------------------------------------------
-        public string Transform( string _strDocument )
+        public string Apply( string _strDocument )
         {
             for( int iOp = 0; iOp < mlOps.Count; iOp++ )
             {
@@ -55,13 +36,51 @@ namespace NuclearOT
         }
 
         //----------------------------------------------------------------------
-        enum TransformMode
+        public static List<DocOp> Insert( UInt16 _uiSite, int _iPosition, string _strValue )
         {
-            Include,
-            Exclude
+            List<DocOp> lOps = new List<DocOp>();
+
+            for( int i = 0; i < _strValue.Length; i++ )
+            {
+                DocOp insertOp = DocOp.Insert( _uiSite, _iPosition + i, _strValue[i] );
+                lOps.Add( insertOp );
+            }
+
+            return lOps;
         }
 
-        void TransformOp( DocOp _refOp, TransformMode _mode )
+        public static List<DocOp> Delete( UInt16 _uiSite, int _iPosition, int _iCount )
+        {
+            List<DocOp> lOps = new List<DocOp>();
+
+            for( int i = 0; i < _iCount; i++ )
+            {
+                DocOp deleteOp = DocOp.Delete( _uiSite, _iPosition );
+                lOps.Add( deleteOp );
+            }
+
+            return lOps;
+        }
+
+        //----------------------------------------------------------------------
+        public void Append( List<DocOp> _lOps )
+        {
+            mlOps.AddRange( _lOps );
+        }
+
+        //----------------------------------------------------------------------
+        public void Include( DocTransform _transform )
+        {
+            foreach( DocOp refOp in _transform.mlOps )
+            {
+                TransformOp( refOp );
+            }
+
+            mlOps.InsertRange( 0, _transform.mlOps );
+        }
+
+        //----------------------------------------------------------------------
+        void TransformOp( DocOp _refOp )
         {
             for( int iOp = 0; iOp < mlOps.Count; iOp++ )
             {
@@ -134,8 +153,6 @@ namespace NuclearOT
                         break;
                 }
             }
-
-            mlOps.Add( _refOp );
         }
     }
 }
