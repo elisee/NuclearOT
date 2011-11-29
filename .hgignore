@@ -1,0 +1,13 @@
+glob:*/obj/*
+glob:*/bin/*
+glob:obj/*
+glob:bin/*
+glob:*.suo
+glob:*.user
+glob:*.cachefile
+glob:*.db
+glob:*.userprefs
+glob:.svn
+glob:.git
+syntax: glob
+*.pidb
