@@ -9,7 +9,7 @@ using NuclearOT;
 namespace NuclearOTTests
 {
     [TestFixture]
-    public class DocTransformTest
+    public class DocTransformTests
     {
         [Test]
         public void SimpleLocalInsertion()
@@ -63,7 +63,7 @@ namespace NuclearOTTests
             string strExpectedResult    = "PrefixString";
 
             DocTransform remoteTransform = new DocTransform( 0 );
-            remoteTransform.Append( DocTransform.Insert( 0, 0, "Prefix" ) );
+            remoteTransform.Append( DocTransform.Insert( 1, 0, "Prefix" ) );
 
             DocTransform localTransform = new DocTransform( 0 );
             localTransform.Include( remoteTransform );
@@ -81,13 +81,57 @@ namespace NuclearOTTests
             string strExpectedResult    = "PrefixChangedInitialString";
             
             DocTransform remoteTransform = new DocTransform( 0 );
-            remoteTransform.Append( DocTransform.Insert( 0, 0, "Prefix" ) );
+            remoteTransform.Append( DocTransform.Insert( 1, 0, "Prefix" ) );
 
             DocTransform localTransform = new DocTransform( 0 );
             localTransform.Append( DocTransform.Insert( 0, 0, "Changed" ) );
             localTransform.Include( remoteTransform );
 
             string strResult = localTransform.Apply( strInitial );
+
+            Assert.AreEqual( strExpectedResult, strResult );
+            Assert.AreEqual( localTransform.ParentStateIndex, 1 );
+        }
+
+        [Test]
+        public void ReplaceTest01()
+        {
+            string strInitial           = "TestString";
+            string strExpectedResult    = "ThstString";
+            
+            DocTransform remoteTransform = new DocTransform( 0 );
+            remoteTransform.Append( DocTransform.Insert( 1, 1, "h" ) );
+            remoteTransform.Append( DocTransform.Delete( 1, 2, 1 ) );
+
+            DocTransform localTransform = new DocTransform( 0 );
+            localTransform.Append( DocTransform.Insert( 0, 1, "s" ) );
+            localTransform.Append( DocTransform.Delete( 0, 2, 1 ) );
+           
+            localTransform.Transform( remoteTransform );
+
+            string strResult = localTransform.Apply( remoteTransform.Apply( strInitial ) );
+
+            Assert.AreEqual( strExpectedResult, strResult );
+            Assert.AreEqual( localTransform.ParentStateIndex, 1 );
+        }
+
+        [Test]
+        public void ReplaceTest02()
+        {
+            string strInitial           = "TestString";
+            string strExpectedResult    = "TsstString";
+            
+            DocTransform remoteTransform = new DocTransform( 0 );
+            remoteTransform.Append( DocTransform.Insert( 0, 1, "h" ) );
+            remoteTransform.Append( DocTransform.Delete( 0, 2, 1 ) );
+
+            DocTransform localTransform = new DocTransform( 0 );
+            localTransform.Append( DocTransform.Insert( 1, 1, "s" ) );
+            localTransform.Append( DocTransform.Delete( 1, 2, 1 ) );
+           
+            localTransform.Transform( remoteTransform );
+
+            string strResult = localTransform.Apply( remoteTransform.Apply( strInitial ) );
 
             Assert.AreEqual( strExpectedResult, strResult );
             Assert.AreEqual( localTransform.ParentStateIndex, 1 );
