@@ -119,9 +119,9 @@ namespace NuclearOT
         {
             List<DocOp> lOps = new List<DocOp>();
 
-            for( int i = 0; i < _strValue.Length; i++ )
+            for( int i = _strValue.Length - 1; i >= 0; i-- )
             {
-                DocOp insertOp = DocOp.Insert( _uiSite, _iPosition + i, _strValue[i] );
+                DocOp insertOp = DocOp.Insert( _uiSite, _iPosition, _strValue[i] );
                 lOps.Add( insertOp );
             }
 
