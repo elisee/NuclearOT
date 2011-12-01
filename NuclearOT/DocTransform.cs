@@ -177,14 +177,14 @@ namespace NuclearOT
                 DocOp op = mlOps[iOp];
 
                 // Based on http://www3.ntu.edu.sg/home/czsun/projects/otfaq/#_Toc308616441
-                switch( _refOp.Type )
+                switch( op.Type )
                 {
                     case DocOpType.Insert:
-                            
-                        switch( op.Type )
+                        
+                        switch( _refOp.Type )
                         {
                             case DocOpType.Insert:
-                                if( op.Position < _refOp.Position || op.Position == _refOp.Position && op.Site > _refOp.Site )
+                                if( op.Position < _refOp.Position || ( op.Position == _refOp.Position && op.Site > _refOp.Site ) )
                                 {
                                     continue;
                                 }
@@ -209,7 +209,7 @@ namespace NuclearOT
                         break;
                     case DocOpType.Delete:
 
-                        switch( op.Type )
+                        switch( _refOp.Type )
                         {
                             case DocOpType.Insert:
                                 if( op.Position < _refOp.Position )
