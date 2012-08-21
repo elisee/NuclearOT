@@ -170,6 +170,40 @@ namespace NuclearOT
         }
 
         //----------------------------------------------------------------------
+        public void TransformCaret( ref int _iSelectionStart, ref int _iSelectionEnd, UInt16 _uiCaretSite )
+        {
+            foreach( DocOp op in mlOps )
+            {
+                switch( op.Type )
+                {
+                    case NuclearOT.DocOpType.Insert:
+                        if( op.Position < _iSelectionStart || ( op.Position == _iSelectionStart && ( _iSelectionEnd > _iSelectionStart || op.Site == _uiCaretSite ) ) )
+                        {
+                            _iSelectionStart++;
+                        }
+
+                        if( op.Position < _iSelectionEnd || ( op.Position == _iSelectionEnd && _iSelectionEnd < _iSelectionStart || op.Site == _uiCaretSite ) )
+                        {
+                            _iSelectionEnd++;
+                        }
+                        break;
+
+                    case NuclearOT.DocOpType.Delete:
+                        if( op.Position < _iSelectionStart )
+                        {
+                            _iSelectionStart--;
+                        }
+
+                        if( op.Position < _iSelectionEnd )
+                        {
+                            _iSelectionEnd--;
+                        }
+                        break;
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------
         void TransformOp( DocOp _refOp )
         {
             for( int iOp = 0; iOp < mlOps.Count; iOp++ )
